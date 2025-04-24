@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worldwide Weather</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #89f7fe, #66a6ff);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-top: 30px;
+      color: #ffffff;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    form {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 250px;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      background-color: #0056ff;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #003d99;
+    }
+
+    .weather-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .weather-info {
+      background: rgba(190, 219, 242, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 300px;
+      height: 400px; /* Set a fixed height */
+    }
+
+    #historical-chart {
+      background-color: rgba(190, 219, 242, 0.8); /* Same background as weather-info */
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      height: 450px; /* Increased height */
+      width: 450px; /* Increased width */
+    }
+
+    #weatherChart {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      height: 300px;
+      width: 300px;
+    }
+
+    #map {
+      height: 400px;
+      width: 100%;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .weather-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .weather-info,
+      #weatherChart,
+      #historical-chart {
+        width: 90%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+<h1>Worldwide Weather</h1>
+<form id="weather-form">
+  <input type="text" id="city-input" placeholder="Enter city" required>
+  <button type="submit">Get Weather</button>
+</form>
+
+<!-- Weather container with both weather info and chart -->
+<div class="weather-container">
+  <div class="weather-info" id="weather-info">
+    <h2>Weather in <span id="city-name"></span></h2>
+    <p id="current-temp"></p>
+    <p id="current-condition"></p>
+    <p id="sunrise"></p>
+    <p id="sunset"></p>
+  </div>
+
+  <!-- Historical chart box -->
+  <div id="historical-chart-box">
+    <canvas id="historical-chart" width="450" height="450"></canvas>
+  </div>
+</div>
+
+<!-- Map container -->
+<div id="map"></div>
+
+<script src="scrtipt.js"></script>
+<script src="map.js"></script>
+</body>
+</html>
