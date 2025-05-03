@@ -112,7 +112,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
     // If you have a map to update, you can add a function to update it here
     addMap(latitude, longitude, city);
-git a
+
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
     console.error('Error fetching weather data:', error);
