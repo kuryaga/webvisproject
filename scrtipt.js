@@ -1,3 +1,5 @@
+let map;
+let marker;
 document.getElementById('weather-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -112,6 +114,25 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
     // If you have a map to update, you can add a function to update it here
     addMap(latitude, longitude, city);
+
+    function addMap(lat, lon, city) {
+      if (!map) {
+        map = L.map('map').setView([lat, lon], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        marker = L.marker([lat, lon]).addTo(map)
+            .bindPopup(`Weather location: ${city}`)
+            .openPopup();
+      } else {
+        map.setView([lat, lon], 10);
+        marker.setLatLng([lat, lon])
+            .setPopupContent(`Weather location: ${city}`)
+            .openPopup();
+      }
+    }
+
 
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
