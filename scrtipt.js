@@ -22,8 +22,20 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
     if (!geocodeData.results || geocodeData.results.length === 0) {
       document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
+
+      if (window.historicalChart) {
+        window.historicalChart.destroy();
+        window.historicalChart = null;
+      }
+
+      if (marker) {
+        map.removeLayer(marker);
+        marker = null;
+      }
+
       return;
     }
+
 
     const { latitude, longitude } = geocodeData.results[0];
 
