@@ -155,7 +155,7 @@ async function fetchWeather(latitude, longitude, city) {
 
     //Display weather info
     document.getElementById('weather-info').innerHTML = weatherInfo;
-    
+
     addMap(latitude, longitude, city);
 
   } catch (error) {
