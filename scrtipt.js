@@ -59,8 +59,11 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
     // Step 4: Fetch historical weather data (past 7 days)
     const today = new Date();
-    const endDate = today.toISOString().split('T')[0];
-    const startDate = new Date(today.setDate(today.getDate() - 6)).toISOString().split('T')[0];
+    const end = new Date(today.setDate(today.getDate() - 2));
+    const start = new Date(today.setDate(today.getDate() - 6));
+
+    const endDate = end.toISOString().split('T')[0];
+    const startDate = start.toISOString().split('T')[0];
 
     const historicalUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${startDate}&end_date=${endDate}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
     const historicalResponse = await fetch(historicalUrl);
