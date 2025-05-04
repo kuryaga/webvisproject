@@ -39,7 +39,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
       return;
     }
 
-    // Show options to the user
     document.getElementById('weather-info').innerHTML = `<p>Multiple locations found. Please choose:</p>`;
 
     geocodeData.results.forEach((result) => {
@@ -66,7 +65,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
 async function fetchWeather(latitude, longitude, city) {
   try {
-    //Fetch current weather data
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=sunrise,sunset&timezone=auto`;
     const weatherResponse = await fetch(weatherUrl);
     const weatherData = await weatherResponse.json();
@@ -87,7 +85,6 @@ async function fetchWeather(latitude, longitude, city) {
     const sunriseTime = new Date(weatherData.daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     const sunsetTime = new Date(weatherData.daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
-    //Display current weather info
     let weatherInfo = `
       <h2>Weather in ${city}</h2>
       <p>Temperature: ${temperature}°C</p>
@@ -96,7 +93,6 @@ async function fetchWeather(latitude, longitude, city) {
       <p>Sunset: ${sunsetTime}</p>
     `;
 
-    //Fetch historical weather data
     const today = new Date();
     const end = new Date(today.setDate(today.getDate() - 2));
     const start = new Date(today.setDate(today.getDate() - 6));
@@ -113,7 +109,6 @@ async function fetchWeather(latitude, longitude, city) {
     const minTemps = historicalData.daily.temperature_2m_min;
     const maxTemps = historicalData.daily.temperature_2m_max;
 
-    //Create the chart
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
     window.historicalChart = new Chart(ctx, {
@@ -153,7 +148,6 @@ async function fetchWeather(latitude, longitude, city) {
       }
     });
 
-    //Display weather info
     document.getElementById('weather-info').innerHTML = weatherInfo;
 
     addMap(latitude, longitude, city);
