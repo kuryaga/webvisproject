@@ -5,12 +5,12 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
   const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`;
 
   try {
-    document.getElementById('weather-info').innerHTML = ''; // Clear weather info
+    document.getElementById('weather-info').innerHTML = '';
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
 
     if (window.historicalChart) {
-      window.historicalChart.destroy(); // Clear previous chart
+      window.historicalChart.destroy(); 
     }
 
     const geocodeResponse = await fetch(geocodeUrl);
