@@ -7,16 +7,14 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
   const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`;
 
   try {
-    // Clear previous data
-    document.getElementById('weather-info').innerHTML = ''; // Clear weather info
+    document.getElementById('weather-info').innerHTML = ''; 
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
 
     if (window.historicalChart) {
-      window.historicalChart.destroy(); // Clear previous chart
+      window.historicalChart.destroy();
     }
 
-    // Step 1: Get latitude and longitude for the city
     const geocodeResponse = await fetch(geocodeUrl);
     const geocodeData = await geocodeResponse.json();
 
@@ -39,7 +37,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
     const { latitude, longitude } = geocodeData.results[0];
 
-    // Step 2: Fetch current weather data
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=sunrise,sunset&timezone=auto`;
     const weatherResponse = await fetch(weatherUrl);
     const weatherData = await weatherResponse.json();
@@ -69,7 +66,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
       <p>Sunset: ${sunsetTime}</p>
     `;
 
-    // Step 4: Fetch historical weather data (past 7 days)
     const today = new Date();
     const end = new Date(today.setDate(today.getDate() - 2));
     const start = new Date(today.setDate(today.getDate() - 6));
@@ -81,12 +77,10 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const historicalResponse = await fetch(historicalUrl);
     const historicalData = await historicalResponse.json();
 
-    // Prepare data for the chart
     const labels = historicalData.daily.time;  // Dates for x-axis
     const minTemps = historicalData.daily.temperature_2m_min; // Min temperatures
     const maxTemps = historicalData.daily.temperature_2m_max; // Max temperatures
 
-    // Step 5: Create the chart
     window.historicalChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -124,10 +118,8 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
       }
     });
 
-    // Step 6: Display weather info
     document.getElementById('weather-info').innerHTML = weatherInfo;
 
-    // If you have a map to update, you can add a function to update it here
     addMap(latitude, longitude, city);
 
     function addMap(lat, lon, city) {
