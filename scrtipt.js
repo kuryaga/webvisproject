@@ -8,6 +8,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
   try {
     document.getElementById('weather-info').innerHTML = ''; 
+
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
 
@@ -57,7 +58,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const sunriseTime = new Date(weatherData.daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     const sunsetTime = new Date(weatherData.daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
-    // Step 3: Display current weather info
     let weatherInfo = `  
       <h2>Weather in ${city}</h2>
       <p>Temperature: ${temperature}°C</p>
@@ -77,9 +77,9 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const historicalResponse = await fetch(historicalUrl);
     const historicalData = await historicalResponse.json();
 
-    const labels = historicalData.daily.time;  // Dates for x-axis
-    const minTemps = historicalData.daily.temperature_2m_min; // Min temperatures
-    const maxTemps = historicalData.daily.temperature_2m_max; // Max temperatures
+    const labels = historicalData.daily.time;  
+    const minTemps = historicalData.daily.temperature_2m_min; 
+    const maxTemps = historicalData.daily.temperature_2m_max; 
 
     window.historicalChart = new Chart(ctx, {
       type: 'line',
@@ -120,8 +120,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
     document.getElementById('weather-info').innerHTML = weatherInfo;
 
-    addMap(latitude, longitude, city);
-
     function addMap(lat, lon, city) {
       if (!map) {
         map = L.map('map').setView([lat, lon], 10);
@@ -139,6 +137,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
             .openPopup();
       }
     }
+
 
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
