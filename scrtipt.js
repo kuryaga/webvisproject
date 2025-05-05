@@ -19,31 +19,36 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const geocodeData = await geocodeResponse.json();
 
     if (!geocodeData.results || geocodeData.results.length === 0) {
-      document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
-      if (window.historicalChart) {
-        window.historicalChart.destroy();
-        window.historicalChart = null;
-      }
-      if (marker) {
-        map.removeLayer(marker);
-        marker = null;
-      }
-      return;
-    }
+  document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
+  if (window.historicalChart) {
+    window.historicalChart.destroy();
+    window.historicalChart = null;
+  }
+  if (marker) {
+    map.removeLayer(marker);
+    marker = null;
+  }
+  return;
+}
 
-    document.getElementById('weather-info').innerHTML = `<p>Multiple locations found. Please choose:</p>`;
+if (geocodeData.results.length === 1) {
+  const result = geocodeData.results[0];
+  fetchWeather(result.latitude, result.longitude, result.name);
+} else {
+  document.getElementById('weather-info').innerHTML = `<p>Multiple locations found. Please choose:</p>`;
+  geocodeData.results.forEach((result) => {
+    const button = document.createElement('button');
+    button.textContent = `${result.name}, ${result.country}${result.admin1 ? ', ' + result.admin1 : ''}`;
+    button.style.margin = '5px';
+    button.onclick = () => {
+      optionsContainer.innerHTML = '';
+      document.getElementById('weather-info').innerHTML = '';
+      fetchWeather(result.latitude, result.longitude, result.name);
+    };
+    optionsContainer.appendChild(button);
+  });
+}
 
-    geocodeData.results.forEach((result) => {
-      const button = document.createElement('button');
-      button.textContent = `${result.name}, ${result.country}${result.admin1 ? ', ' + result.admin1 : ''}`;
-      button.style.margin = '5px';
-      button.onclick = () => {
-        optionsContainer.innerHTML = '';
-        document.getElementById('weather-info').innerHTML = '';
-        fetchWeather(result.latitude, result.longitude, result.name);
-      };
-      optionsContainer.appendChild(button);
-    });
 
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
@@ -51,11 +56,8 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
   }
 });
 
-
-async function fetchWeather(latitude, longitude, city, numDays = 5) {
-  try {
-    currentCoords = { latitude, longitude };
-    currentCity = city;
+async function fetchWeather(latitude, longitude, city) {
+  try { 
 
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=sunrise,sunset&timezone=auto`;
     const weatherResponse = await fetch(weatherUrl);
@@ -76,7 +78,7 @@ async function fetchWeather(latitude, longitude, city, numDays = 5) {
     const sunriseTime = new Date(weatherData.daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     const sunsetTime = new Date(weatherData.daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
-    const weatherInfo = `
+    let weatherInfo = `
       <h2>Weather in ${city}</h2>
       <p>Temperature: ${temperature}°C</p>
       <p>Condition: ${condition}</p>
@@ -157,6 +159,9 @@ async function fetchHistoricalData(latitude, longitude, numDays) {
       }
     });
 
+
+    document.getElementById('weather-info').innerHTML = weatherInfo;
+    
 
   } catch (error) {
     console.error('Error fetching historical data:', error);
