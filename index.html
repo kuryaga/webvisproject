@@ -110,10 +110,15 @@
   <button type="submit">Get Weather</button>
 </form>
 
+
+<div id="city-options" style="margin-top: 10px;"></div>
+
 <!-- Weather container with both weather info and chart -->
 <div class="weather-container">
   <div class="weather-info" id="weather-info">
     <h2>Weather in <span id="city-name"></span></h2>
+    <p><strong>Data Source:</strong> Weather data is provided by <a href="https://open-meteo.com/en" target="_blank">Open-Meteo API</a>.</p>
+    <p><em>Note: The weather data displayed in the left panel corresponds to the current time and location.</em></p>
     <p id="current-temp"></p>
     <p id="current-condition"></p>
     <p id="sunrise"></p>
