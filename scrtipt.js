@@ -12,7 +12,8 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const ctx = chartCanvas.getContext('2d');
 
     if (window.historicalChart) {
-      window.historicalChart.destroy(); 
+
+      window.historicalChart.destroy();
     }
 
     const geocodeResponse = await fetch(geocodeUrl);
@@ -62,7 +63,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const historicalData = await historicalResponse.json();
 
     const labels = historicalData.daily.time;
-    const minTemps = historicalData.daily.temperature_2m_min; 
+    const minTemps = historicalData.daily.temperature_2m_min;
     const maxTemps = historicalData.daily.temperature_2m_max;
 
     window.historicalChart = new Chart(ctx, {
@@ -121,7 +122,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
             .openPopup();
       }
     }
-
 
 
   } catch (error) {
