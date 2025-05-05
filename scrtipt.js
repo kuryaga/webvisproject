@@ -102,8 +102,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
       }
     });
 
-    document.getElementById('weather-info').innerHTML = weatherInfo;
-
     function addMap(lat, lon, city) {
       if (!map) {
         map = L.map('map').setView([lat, lon], 10);
@@ -122,7 +120,8 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
       }
     }
 
-
+document.getElementById('weather-info').innerHTML = weatherInfo;
+    addMap(latitude, longitude, city);
 
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
