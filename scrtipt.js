@@ -9,12 +9,14 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
   try {
     document.getElementById('weather-info').innerHTML = '';
+
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
 
     if (window.historicalChart) {
       window.historicalChart.destroy();
     }
+
 
     const optionsContainer = document.getElementById('city-options');
     optionsContainer.innerHTML = '';
@@ -63,6 +65,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
   }
 });
 
+
 async function fetchWeather(latitude, longitude, city) {
   try {
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=sunrise,sunset&timezone=auto`;
@@ -84,6 +87,7 @@ async function fetchWeather(latitude, longitude, city) {
 
     const sunriseTime = new Date(weatherData.daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     const sunsetTime = new Date(weatherData.daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
 
     let weatherInfo = `
       <h2>Weather in ${city}</h2>
@@ -111,6 +115,7 @@ async function fetchWeather(latitude, longitude, city) {
 
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
+
     window.historicalChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -150,7 +155,6 @@ async function fetchWeather(latitude, longitude, city) {
 
     document.getElementById('weather-info').innerHTML = weatherInfo;
 
-    addMap(latitude, longitude, city);
 
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
