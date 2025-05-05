@@ -7,21 +7,34 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
   const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`;
 
   try {
-    document.getElementById('weather-info').innerHTML = '';
+    document.getElementById('weather-info').innerHTML = ''; 
+
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
 
     if (window.historicalChart) {
-      window.historicalChart.destroy(); 
+      window.historicalChart.destroy();
     }
-    
+
     const geocodeResponse = await fetch(geocodeUrl);
     const geocodeData = await geocodeResponse.json();
 
     if (!geocodeData.results || geocodeData.results.length === 0) {
       document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
+
+      if (window.historicalChart) {
+        window.historicalChart.destroy();
+        window.historicalChart = null;
+      }
+
+      if (marker) {
+        map.removeLayer(marker);
+        marker = null;
+      }
+
       return;
     }
+
 
     const { latitude, longitude } = geocodeData.results[0];
 
