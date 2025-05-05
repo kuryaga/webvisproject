@@ -11,6 +11,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
   try {
     document.getElementById('weather-info').innerHTML = '';
+
     const optionsContainer = document.getElementById('city-options');
     optionsContainer.innerHTML = '';
 
@@ -49,6 +50,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     console.error('Error fetching weather data:', error);
   }
 });
+
 
 async function fetchWeather(latitude, longitude, city, numDays = 5) {
   try {
@@ -92,8 +94,10 @@ async function fetchWeather(latitude, longitude, city, numDays = 5) {
   }
 }
 
+
 async function fetchHistoricalData(latitude, longitude, numDays) {
   try {
+
     const today = new Date();
     const end = new Date(today);
     const start = new Date(today.setDate(today.getDate() - numDays));
@@ -152,6 +156,7 @@ async function fetchHistoricalData(latitude, longitude, numDays) {
         }
       }
     });
+
 
   } catch (error) {
     console.error('Error fetching historical data:', error);
