@@ -112,9 +112,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     // Step 6: Display weather info
     document.getElementById('weather-info').innerHTML = weatherInfo;
 
-    // If you have a map to update, you can add a function to update it here
-    addMap(latitude, longitude, city);
-
     function addMap(lat, lon, city) {
       if (!map) {
         map = L.map('map').setView([lat, lon], 10);
