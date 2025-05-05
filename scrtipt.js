@@ -11,7 +11,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
   try {
     document.getElementById('weather-info').innerHTML = '';
-
     const optionsContainer = document.getElementById('city-options');
     optionsContainer.innerHTML = '';
 
@@ -19,37 +18,35 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const geocodeData = await geocodeResponse.json();
 
     if (!geocodeData.results || geocodeData.results.length === 0) {
-  document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
-  if (window.historicalChart) {
-    window.historicalChart.destroy();
-    window.historicalChart = null;
-  }
-  if (marker) {
-    map.removeLayer(marker);
-    marker = null;
-  }
-  return;
-}
+      document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
+      if (window.historicalChart) {
+        window.historicalChart.destroy();
+        window.historicalChart = null;
+      }
+      if (marker) {
+        map.removeLayer(marker);
+        marker = null;
+      }
+      return;
+    }
 
-if (geocodeData.results.length === 1) {
-  const result = geocodeData.results[0];
-  fetchWeather(result.latitude, result.longitude, result.name);
-} else {
-  document.getElementById('weather-info').innerHTML = `<p>Multiple locations found. Please choose:</p>`;
-  geocodeData.results.forEach((result) => {
-    const button = document.createElement('button');
-    button.textContent = `${result.name}, ${result.country}${result.admin1 ? ', ' + result.admin1 : ''}`;
-    button.style.margin = '5px';
-    button.onclick = () => {
-      optionsContainer.innerHTML = '';
-      document.getElementById('weather-info').innerHTML = '';
+    if (geocodeData.results.length === 1) {
+      const result = geocodeData.results[0];
       fetchWeather(result.latitude, result.longitude, result.name);
-    };
-    optionsContainer.appendChild(button);
-  });
-}
-
-
+    } else {
+      document.getElementById('weather-info').innerHTML = `<p>Multiple locations found. Please choose:</p>`;
+      geocodeData.results.forEach((result) => {
+        const button = document.createElement('button');
+        button.textContent = `${result.name}, ${result.country}${result.admin1 ? ', ' + result.admin1 : ''}`;
+        button.style.margin = '5px';
+        button.onclick = () => {
+          optionsContainer.innerHTML = '';
+          document.getElementById('weather-info').innerHTML = '';
+          fetchWeather(result.latitude, result.longitude, result.name);
+        };
+        optionsContainer.appendChild(button);
+      });
+    }
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
     console.error('Error fetching weather data:', error);
@@ -57,8 +54,7 @@ if (geocodeData.results.length === 1) {
 });
 
 async function fetchWeather(latitude, longitude, city) {
-  try { 
-
+  try {
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=sunrise,sunset&timezone=auto`;
     const weatherResponse = await fetch(weatherUrl);
     const weatherData = await weatherResponse.json();
@@ -70,7 +66,7 @@ async function fetchWeather(latitude, longitude, city) {
       61: "Light Rain", 63: "Moderate Rain", 65: "Heavy Rain",
       71: "Light Snow", 73: "Moderate Snow", 75: "Heavy Snow",
       80: "Light Rain Shower", 81: "Moderate Rain Shower", 82: "Violent Rain Shower",
-      95: "Slight or Moderate Thunderstorm", 96: "Thunderstorm With Slight Hail", 99: "Thunderstorm With Heavy Hail",
+      95: "Slight or Moderate Thunderstorm", 96: "Thunderstorm With Slight Hail", 99: "Thunderstorm With Heavy Hail"
     };
 
     const condition = weatherDescriptions[weatherData.current_weather.weathercode] || "Unknown condition";
@@ -87,22 +83,22 @@ async function fetchWeather(latitude, longitude, city) {
     `;
     document.getElementById('weather-info').innerHTML = weatherInfo;
 
-    await fetchHistoricalData(latitude, longitude, numDays);
-    addMap(latitude, longitude, city);
+    currentCoords = { latitude, longitude };
+    currentCity = city;
 
+    addMap(latitude, longitude, city);
+    await fetchHistoricalData(latitude, longitude);
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
     console.error('Error fetching weather data:', error);
   }
 }
 
-
-async function fetchHistoricalData(latitude, longitude, numDays) {
+async function fetchHistoricalData(latitude, longitude) {
   try {
-
     const today = new Date();
     const end = new Date(today);
-    const start = new Date(today.setDate(today.getDate() - numDays));
+    const start = new Date(today.setDate(today.getDate() - 7));
 
     const endDate = end.toISOString().split('T')[0];
     const startDate = start.toISOString().split('T')[0];
@@ -131,13 +127,13 @@ async function fetchHistoricalData(latitude, longitude, numDays) {
             label: 'Min Temperature (°C)',
             data: minTemps,
             borderColor: 'blue',
-            fill: false,
+            fill: false
           },
           {
             label: 'Max Temperature (°C)',
             data: maxTemps,
             borderColor: 'red',
-            fill: false,
+            fill: false
           }
         ]
       },
@@ -158,26 +154,11 @@ async function fetchHistoricalData(latitude, longitude, numDays) {
         }
       }
     });
-
-
-    document.getElementById('weather-info').innerHTML = weatherInfo;
-    
-
   } catch (error) {
     console.error('Error fetching historical data:', error);
     alert('Could not fetch historical data.');
   }
 }
-
-document.getElementById('days-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const numDays = parseInt(document.getElementById('days-input').value);
-  if (!currentCoords || isNaN(numDays) || numDays < 1) {
-    alert('Please enter a valid number and select a city first.');
-    return;
-  }
-  await fetchHistoricalData(currentCoords.latitude, currentCoords.longitude, numDays);
-});
 
 function addMap(lat, lon, city) {
   if (!map) {
@@ -187,12 +168,12 @@ function addMap(lat, lon, city) {
     }).addTo(map);
 
     marker = L.marker([lat, lon]).addTo(map)
-        .bindPopup(`Weather location: ${city}`)
-        .openPopup();
+      .bindPopup(`Weather location: ${city}`)
+      .openPopup();
   } else {
     map.setView([lat, lon], 10);
     marker.setLatLng([lat, lon])
-        .setPopupContent(`Weather location: ${city}`)
-        .openPopup();
+      .setPopupContent(`Weather location: ${city}`)
+      .openPopup();
   }
 }
