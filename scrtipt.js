@@ -12,6 +12,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const ctx = chartCanvas.getContext('2d');
 
     if (window.historicalChart) {
+
       window.historicalChart.destroy();
     }
 
@@ -101,10 +102,8 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
         }
       }
     });
-    
-    document.getElementById('weather-info').innerHTML = weatherInfo;
 
-    addMap(latitude, longitude, city);
+    document.getElementById('weather-info').innerHTML = weatherInfo;
 
     function addMap(lat, lon, city) {
       if (!map) {
@@ -123,6 +122,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
             .openPopup();
       }
     }
+
 
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
