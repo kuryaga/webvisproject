@@ -12,10 +12,9 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const ctx = chartCanvas.getContext('2d');
 
     if (window.historicalChart) {
-
-      window.historicalChart.destroy();
+      window.historicalChart.destroy(); 
     }
-
+    
     const geocodeResponse = await fetch(geocodeUrl);
     const geocodeData = await geocodeResponse.json();
 
@@ -55,16 +54,19 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     `;
 
     const today = new Date();
-    const endDate = today.toISOString().split('T')[0];
-    const startDate = new Date(today.setDate(today.getDate() - 6)).toISOString().split('T')[0];
+    const end = new Date(today.setDate(today.getDate() - 2));
+    const start = new Date(today.setDate(today.getDate() - 6));
+
+    const endDate = end.toISOString().split('T')[0];
+    const startDate = start.toISOString().split('T')[0];
 
     const historicalUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${latitude}&longitude=${longitude}&start_date=${startDate}&end_date=${endDate}&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
     const historicalResponse = await fetch(historicalUrl);
     const historicalData = await historicalResponse.json();
 
-    const labels = historicalData.daily.time;
-    const minTemps = historicalData.daily.temperature_2m_min;
-    const maxTemps = historicalData.daily.temperature_2m_max;
+    const labels = historicalData.daily.time;  
+    const minTemps = historicalData.daily.temperature_2m_min; 
+    const maxTemps = historicalData.daily.temperature_2m_max; 
 
     window.historicalChart = new Chart(ctx, {
       type: 'line',
