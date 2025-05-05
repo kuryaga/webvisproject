@@ -1,5 +1,7 @@
 let map;
 let marker;
+let currentCoords = null;
+let currentCity = null;
 
 document.getElementById('weather-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -9,12 +11,6 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
   try {
     document.getElementById('weather-info').innerHTML = '';
-    const chartCanvas = document.getElementById('historical-chart');
-    const ctx = chartCanvas.getContext('2d');
-
-    if (window.historicalChart) {
-      window.historicalChart.destroy();
-    }
 
     const optionsContainer = document.getElementById('city-options');
     optionsContainer.innerHTML = '';
@@ -22,40 +18,37 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
     const geocodeResponse = await fetch(geocodeUrl);
     const geocodeData = await geocodeResponse.json();
 
-
     if (!geocodeData.results || geocodeData.results.length === 0) {
-      document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
+  document.getElementById('weather-info').innerHTML = `<p>City not found. Please try again.</p>`;
+  if (window.historicalChart) {
+    window.historicalChart.destroy();
+    window.historicalChart = null;
+  }
+  if (marker) {
+    map.removeLayer(marker);
+    marker = null;
+  }
+  return;
+}
 
-      if (window.historicalChart) {
-        window.historicalChart.destroy();
-        window.historicalChart = null;
-      }
+if (geocodeData.results.length === 1) {
+  const result = geocodeData.results[0];
+  fetchWeather(result.latitude, result.longitude, result.name);
+} else {
+  document.getElementById('weather-info').innerHTML = `<p>Multiple locations found. Please choose:</p>`;
+  geocodeData.results.forEach((result) => {
+    const button = document.createElement('button');
+    button.textContent = `${result.name}, ${result.country}${result.admin1 ? ', ' + result.admin1 : ''}`;
+    button.style.margin = '5px';
+    button.onclick = () => {
+      optionsContainer.innerHTML = '';
+      document.getElementById('weather-info').innerHTML = '';
+      fetchWeather(result.latitude, result.longitude, result.name);
+    };
+    optionsContainer.appendChild(button);
+  });
+}
 
-      if (marker) {
-        map.removeLayer(marker);
-        marker = null;
-      }
-
-      return;
-    }
-
-    document.getElementById('weather-info').innerHTML = `<p>Multiple locations found. Please choose:</p>`;
-
-    geocodeData.results.forEach((result) => {
-      const button = document.createElement('button');
-      button.textContent = `${result.name}, ${result.country}${result.admin1 ? ', ' + result.admin1 : ''}`;
-      button.style.margin = '5px';
-      button.onclick = () => {
-
-        optionsContainer.innerHTML = '';
-        document.getElementById('weather-info').innerHTML = '';
-
-        fetchWeather(result.latitude, result.longitude, result.name);
-      };
-      optionsContainer.appendChild(button);
-    });
-
-    return;
 
   } catch (error) {
     document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
@@ -65,6 +58,7 @@ document.getElementById('weather-form').addEventListener('submit', async (e) => 
 
 async function fetchWeather(latitude, longitude, city) {
   try { 
+
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&daily=sunrise,sunset&timezone=auto`;
     const weatherResponse = await fetch(weatherUrl);
     const weatherData = await weatherResponse.json();
@@ -81,7 +75,6 @@ async function fetchWeather(latitude, longitude, city) {
 
     const condition = weatherDescriptions[weatherData.current_weather.weathercode] || "Unknown condition";
     const temperature = weatherData.current_weather.temperature;
-
     const sunriseTime = new Date(weatherData.daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     const sunsetTime = new Date(weatherData.daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
@@ -92,10 +85,24 @@ async function fetchWeather(latitude, longitude, city) {
       <p>Sunrise: ${sunriseTime}</p>
       <p>Sunset: ${sunsetTime}</p>
     `;
+    document.getElementById('weather-info').innerHTML = weatherInfo;
+
+    await fetchHistoricalData(latitude, longitude, numDays);
+    addMap(latitude, longitude, city);
+
+  } catch (error) {
+    document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
+    console.error('Error fetching weather data:', error);
+  }
+}
+
+
+async function fetchHistoricalData(latitude, longitude, numDays) {
+  try {
 
     const today = new Date();
-    const end = new Date(today.setDate(today.getDate() - 2));
-    const start = new Date(today.setDate(today.getDate() - 6));
+    const end = new Date(today);
+    const start = new Date(today.setDate(today.getDate() - numDays));
 
     const endDate = end.toISOString().split('T')[0];
     const startDate = start.toISOString().split('T')[0];
@@ -104,13 +111,17 @@ async function fetchWeather(latitude, longitude, city) {
     const historicalResponse = await fetch(historicalUrl);
     const historicalData = await historicalResponse.json();
 
-
     const labels = historicalData.daily.time;
     const minTemps = historicalData.daily.temperature_2m_min;
     const maxTemps = historicalData.daily.temperature_2m_max;
 
     const chartCanvas = document.getElementById('historical-chart');
     const ctx = chartCanvas.getContext('2d');
+
+    if (window.historicalChart) {
+      window.historicalChart.destroy();
+    }
+
     window.historicalChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -148,15 +159,25 @@ async function fetchWeather(latitude, longitude, city) {
       }
     });
 
+
     document.getElementById('weather-info').innerHTML = weatherInfo;
     
-    addMap(latitude, longitude, city);
 
   } catch (error) {
-    document.getElementById('weather-info').innerHTML = `<p>Could not fetch weather data. Try again later.</p>`;
-    console.error('Error fetching weather data:', error);
+    console.error('Error fetching historical data:', error);
+    alert('Could not fetch historical data.');
   }
 }
+
+document.getElementById('days-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const numDays = parseInt(document.getElementById('days-input').value);
+  if (!currentCoords || isNaN(numDays) || numDays < 1) {
+    alert('Please enter a valid number and select a city first.');
+    return;
+  }
+  await fetchHistoricalData(currentCoords.latitude, currentCoords.longitude, numDays);
+});
 
 function addMap(lat, lon, city) {
   if (!map) {
