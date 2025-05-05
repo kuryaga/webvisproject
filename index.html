@@ -82,13 +82,6 @@
       width: 450px; /* Increased width */
     }
 
-    #weatherChart {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      height: 300px;
-      width: 300px;
-    }
 
     #map {
       height: 400px;
@@ -103,7 +96,6 @@
       }
 
       .weather-info,
-      #weatherChart,
       #historical-chart {
         width: 90%;
         height: auto;
@@ -118,10 +110,15 @@
   <button type="submit">Get Weather</button>
 </form>
 
+
+<div id="city-options" style="margin-top: 10px;"></div>
+
 <!-- Weather container with both weather info and chart -->
 <div class="weather-container">
   <div class="weather-info" id="weather-info">
     <h2>Weather in <span id="city-name"></span></h2>
+    <p><strong>Data Source:</strong> Weather data is provided by <a href="https://open-meteo.com/en" target="_blank">Open-Meteo API</a>.</p>
+    <p><em>Note: The weather data displayed in the left panel corresponds to the current time and location.</em></p>
     <p id="current-temp"></p>
     <p id="current-condition"></p>
     <p id="sunrise"></p>
@@ -133,6 +130,14 @@
     <canvas id="historical-chart" width="450" height="450"></canvas>
   </div>
 </div>
+
+<!-- Number of Days Input -->
+<form id="days-form" style="margin-top: 10px;">
+  <label for="days-input">Number of days:</label>
+  <input type="number" id="days-input" min="1" max="30" value="7" required>
+  <button type="submit">Show Data</button>
+</form>
+
 
 <!-- Map container -->
 <div id="map"></div>
